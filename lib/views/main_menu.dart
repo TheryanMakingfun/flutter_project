@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({super.key});
+class MainMenu extends StatelessWidget {
+  const MainMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -9,6 +9,7 @@ class Dashboard extends StatelessWidget {
      backgroundColor: const Color.fromARGB(255, 210, 208, 249),
      body: SafeArea(
       child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,14 +27,11 @@ class Dashboard extends StatelessWidget {
                     Text("Selamat datang di SABDA!", style: TextStyle(fontSize: 12,color: Color.fromARGB(255, 99, 99, 99)),),
                   ],
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  padding: EdgeInsets.all(12),
-                  child: Icon(Icons.person, size: 30, color: Colors.black54),
-                ),
+                CircleAvatar(
+                  radius: 24, // ukuran lingkaran
+                  backgroundImage: AssetImage("assets/img/image1.jpeg"),
+                  backgroundColor: Colors.grey[200], // fallback warna kalo gambar gagal load
+                )
               ],
             ),
             const SizedBox(height: 20),
@@ -84,7 +82,7 @@ class Dashboard extends StatelessWidget {
                 ),
               ),
             
-              const SizedBox(height: 16),
+              const SizedBox(height: 120),
 
               //row laporkan dan edukasi
               Row(
@@ -130,8 +128,6 @@ class Dashboard extends StatelessWidget {
                   ),
                 ],
               ),
-
-
           ],
         ),
       )), 

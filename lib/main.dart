@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5a/views/dashboard.dart';
+//import 'package:flutter_5a/views/main_menu.dart';
+import 'package:flutter_5a/views/dashboard_main.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 58, 183, 179)),
       ),
-      home: const Dashboard(),
+      home: const DashboardMain(),
     );
   }
 }
