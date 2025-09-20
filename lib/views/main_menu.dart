@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_5a/views/new_chat.dart';
-import 'package:flutter_5a/views/report.dart'; // Import halaman NewChat
+import 'package:flutter_5a/views/report.dart';
 import 'package:flutter_5a/views/education.dart';
 
 class MainMenu extends StatelessWidget {
@@ -9,7 +9,7 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 210, 208, 249),
+      backgroundColor: const Color.fromARGB(255, 208, 249, 232),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -54,14 +54,14 @@ class MainMenu extends StatelessWidget {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: const Color.fromARGB(255, 172, 220, 255),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.shield, size: 35, color: Colors.blue),
+                    Icon(Icons.shield_rounded, size: 25, color: Colors.blue),
                     SizedBox(height: 12),
                     Text(
                       "Jangan takut bercerita, karena SABDA ruang amanmu untuk berbagi cerita.",
@@ -86,14 +86,14 @@ class MainMenu extends StatelessWidget {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color:const Color.fromARGB(255, 172, 220, 255),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   padding: const EdgeInsets.all(16),
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.chat, size: 30, color: Colors.blue),
+                      Icon(Icons.chat_rounded, size: 25, color: Colors.blue),
                       SizedBox(height: 12),
                       Text(
                         "New Chat",
@@ -101,7 +101,7 @@ class MainMenu extends StatelessWidget {
                       ),
                       Text(
                         "Aku siap dengar kapan pun kamu mau cerita.",
-                        style: TextStyle(fontSize: 12, color: Colors.blueGrey),
+                        style: TextStyle(fontSize: 12, color: Color.fromARGB(255, 70, 91, 101)),
                       )
                     ],
                   ),
@@ -142,7 +142,7 @@ class MainMenu extends StatelessWidget {
                             Text(
                               "Laporkan terkait masalah yang kamu alami!",
                               textAlign: TextAlign.start,
-                              style: TextStyle(fontSize: 10, color: Colors.blueGrey),
+                              style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
                             )
                           ],
                         ),
@@ -161,7 +161,7 @@ class MainMenu extends StatelessWidget {
                         );
                       },
                     child: Card(
-                      color: Colors.green.shade100,
+                      color: const Color.fromARGB(255, 180, 255, 183),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -170,7 +170,7 @@ class MainMenu extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.menu_book, size: 25, color: Colors.green),
+                            Icon(Icons.menu_book, size: 25, color: Color.fromARGB(255, 42, 169, 46)),
                             SizedBox(height: 8),
                             Text(
                               "Edukasi",
@@ -181,7 +181,7 @@ class MainMenu extends StatelessWidget {
                             Text(
                               "Kumpulan informasi mengenai tindakan bullying.",
                               textAlign: TextAlign.start,
-                              style: TextStyle(fontSize: 10, color: Colors.blueGrey),
+                              style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
                             )
                           ],
                         ),
@@ -205,7 +205,7 @@ class MainMenu extends StatelessWidget {
                   children: [
                     Row(
                       children: const [
-                        Icon(Icons.lightbulb, size: 30, color: Colors.yellow),
+                        Icon(Icons.lightbulb, size: 30, color: Color.fromARGB(255, 255, 230, 0)),
                         SizedBox(width: 12),
                         Text(
                           "Tips Harian",

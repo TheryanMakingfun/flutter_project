@@ -1,4 +1,3 @@
-// lib/views/education.dart
 import 'package:flutter/material.dart';
 
 class Education extends StatelessWidget {
@@ -7,7 +6,7 @@ class Education extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 208, 249, 208),
+      backgroundColor: const Color.fromARGB(255, 180, 255, 183),
       appBar: AppBar(
         title: const Text(
           'Edukasi',

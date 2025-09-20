@@ -13,7 +13,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 219, 217, 254),
+      backgroundColor: const Color.fromARGB(255, 208, 249, 232),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(

@@ -1,4 +1,3 @@
-// lib/views/new_chat.dart
 import 'package:flutter/material.dart';
 
 class NewChat extends StatefulWidget {
@@ -10,16 +9,11 @@ class NewChat extends StatefulWidget {
 
 class _NewChatState extends State<NewChat> {
   final TextEditingController _textController = TextEditingController();
-
-  // Daftar pesan dummy
   final List<String> _messages = [];
-
   void _sendMessage() {
     if (_textController.text.isEmpty) return;
-
-    // Tambahkan pesan yang diketik ke daftar dummy
     setState(() {
-      _messages.add("Kamu: ${_textController.text}");
+      _messages.add(_textController.text);
     });
     _textController.clear();
   }
@@ -42,7 +36,7 @@ class _NewChatState extends State<NewChat> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'SABDA',
+          'SABDA Chat',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -64,9 +58,8 @@ class _NewChatState extends State<NewChat> {
         children: [
           Expanded(
             child: Container(
-              color: const Color.fromARGB(255, 240, 240, 255),
+              color: const Color.fromARGB(255, 208, 249, 232),
               child: ListView.builder(
-                reverse: true,
                 padding: const EdgeInsets.all(16.0),
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
