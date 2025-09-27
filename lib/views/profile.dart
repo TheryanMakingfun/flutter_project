@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_5a/views/dashboard_main.dart';
-import 'package:flutter_5a/views/login.dart'; // Import halaman Login
+import 'package:flutter_5a/views/login.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class Profile extends StatelessWidget {
+  // Tambahkan properti username untuk menerima data dari halaman sebelumnya
+  final String? username;
+  const Profile({super.key, this.username});
 
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 208, 249, 232),
+      backgroundColor: const Color.fromARGB(255, 233, 220, 245),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
@@ -35,19 +31,20 @@ class _ProfileState extends State<Profile> {
               const SizedBox(height: 20),
               const CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage("assets/img/image1.jpeg"),
+                backgroundImage: AssetImage("assets/img/patrick.jpg"),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Dwi Gitayana',
-                style: TextStyle(
+              // Gunakan username yang diterima, jika kosong gunakan default
+              Text(
+                username ?? 'Dwi Gitayana',
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 5),
               const Text(
-                'dwigitayana@gmail.com',
+                'dwigitayana@gmail.com', // Teks email statis
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
@@ -66,31 +63,30 @@ class _ProfileState extends State<Profile> {
               const SizedBox(height: 10),
               _buildSlimTextField(
                 label: 'Email',
-                value: 'dwigitayana@gmail.com',
+                value: 'dwigitayana@gmail.com', // Nilai email statis
+                icon: Icons.person,
+              ),
+              const SizedBox(height: 10),
+              _buildSlimTextField(
+                label: 'Username',
+                value: username ?? 'Dwi Gitayana',
                 icon: Icons.person,
               ),
               const SizedBox(height: 20),
-              _buildSlimTextField(
-                label: 'Username',
-                value: 'Dwi Gitayana',
-                icon: Icons.person,
-              ),
-              const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigasi ke halaman Login dan hapus semua rute sebelumnya
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (context) => const Login()),
                       (Route<dynamic> route) => false,
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: const Text(
@@ -98,6 +94,7 @@ class _ProfileState extends State<Profile> {
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
+                      fontWeight: FontWeight.bold
                     ),
                   ),
                 ),
@@ -130,8 +127,8 @@ class _ProfileState extends State<Profile> {
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.symmetric(horizontal: 15),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black26),
-            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.blue),
+            borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
             children: [

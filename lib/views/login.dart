@@ -9,10 +9,18 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final TextEditingController _usernameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 208, 249, 232),
+      backgroundColor: const Color.fromARGB(255, 233, 220, 245),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -28,7 +36,7 @@ class _LoginState extends State<Login> {
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               const Text(
                 'Masuk ke akun anda!',
                 style: TextStyle(
@@ -36,26 +44,30 @@ class _LoginState extends State<Login> {
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
               _buildTextField(
-                hintText: 'Email',
+                hintText: 'Username', //username atau email
                 icon: Icons.person,
+                controller: _usernameController,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 8),
               _buildTextField(
                 hintText: 'Password',
                 icon: Icons.lock,
                 isPassword: true,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Ketika tombol "Login" ditekan, navigasi ke DashboardMain
+                    String username = _usernameController.text;
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const DashboardMain()),
+                      MaterialPageRoute(
+                        // Kirim username sebagai parameter
+                        builder: (context) => DashboardMain(username: username),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -105,6 +117,7 @@ class _LoginState extends State<Login> {
     required String hintText,
     required IconData icon,
     bool isPassword = false,
+    TextEditingController? controller,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -113,13 +126,14 @@ class _LoginState extends State<Login> {
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
-        style: const TextStyle(fontSize: 16), // Memberikan style pada teks yang diinput
+        style: const TextStyle(fontSize: 16),
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,
           prefixIcon: Icon(icon, color: Colors.grey),
-          contentPadding: const EdgeInsets.symmetric(vertical: 15), // Menyesuaikan padding vertikal
+          contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),
       ),
     );

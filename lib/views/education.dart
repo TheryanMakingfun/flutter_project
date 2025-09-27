@@ -6,7 +6,7 @@ class Education extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 180, 255, 183),
+      backgroundColor: const Color.fromARGB(255, 233, 220, 245),
       appBar: AppBar(
         title: const Text(
           'Edukasi',

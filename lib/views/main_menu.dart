@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5a/views/new_chat.dart';
-import 'package:flutter_5a/views/report.dart';
-import 'package:flutter_5a/views/education.dart';
+//import 'package:flutter_5a/views/new_chat.dart';
+//import 'package:flutter_5a/views/education.dart';
+import 'package:flutter_5a/views/dashboard_main.dart';
+//import 'package:flutter_5a/views/report.dart';
 
 class MainMenu extends StatelessWidget {
-  const MainMenu({super.key});
+  final String? username;
+  const MainMenu({super.key, this.username});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 208, 249, 232),
+      backgroundColor: const Color.fromARGB(255, 233, 220, 245),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -18,37 +20,38 @@ class MainMenu extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Untuk Header
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Hallo,",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                       ),
                       Text(
-                        "Dwi Gitayana",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                        username ?? "Dwi Gitayana",
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 4,
                       ),
-                      Text(
+                      const Text(
                         "Selamat datang di SABDA!",
                         style: TextStyle(fontSize: 12, color: Color.fromARGB(255, 99, 99, 99)),
                       ),
                     ],
                   ),
                   const CircleAvatar(
-                    radius: 24, // ukuran lingkaran
-                    backgroundImage: AssetImage("assets/img/image1.jpeg"),
+                    radius: 30,
+                    backgroundImage: AssetImage("assets/img/patrick.jpg"),
                     backgroundColor: Colors.grey,
                   )
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
               //card ke-1 INFO
               Container(
@@ -72,21 +75,22 @@ class MainMenu extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 25),
 
               // New Chat
               GestureDetector(
                 onTap: () {
-                  // Navigasi ke halaman NewChat saat Container diklik
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const NewChat()),
-                  );
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DashboardMain(initialIndex: 3),
+                          ),
+                        );
                 },
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color:const Color.fromARGB(255, 172, 220, 255),
+                    color: const Color.fromARGB(255, 172, 220, 255),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   padding: const EdgeInsets.all(16),
@@ -108,90 +112,94 @@ class MainMenu extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // row laporkan dan edukasi
               Row(
                 children: [
                   Expanded(
-                    // Bungkus dengan GestureDetector
                     child: GestureDetector(
                       onTap: () {
+                        // Ganti pushReplacement dengan push
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const Report()),
+                          MaterialPageRoute(
+                            builder: (context) => const DashboardMain(initialIndex: 1),
+                          ),
                         );
                       },
-                    child: Card(
-                      color: Colors.red.shade100,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                      child: const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.send, size: 25, color: Colors.red),
-                            SizedBox(height: 8),
-                            Text(
-                              "Laporkan",
-                              textAlign: TextAlign.start,
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              "Laporkan terkait masalah yang kamu alami!",
-                              textAlign: TextAlign.start,
-                              style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
-                            )
-                          ],
+                      child: Card(
+                        color: Colors.red.shade100,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.send, size: 25, color: Colors.red),
+                              SizedBox(height: 8),
+                              Text(
+                                "Laporkan",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                "Laporkan terkait masalah yang kamu alami!",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    // Bungkus dengan GestureDetector
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const Education()),
+                          MaterialPageRoute(
+                            builder: (context) => const DashboardMain(initialIndex: 2),
+                          ),
                         );
                       },
-                    child: Card(
-                      color: const Color.fromARGB(255, 180, 255, 183),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.menu_book, size: 25, color: Color.fromARGB(255, 42, 169, 46)),
-                            SizedBox(height: 8),
-                            Text(
-                              "Edukasi",
-                              textAlign: TextAlign.start,
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              "Kumpulan informasi mengenai tindakan bullying.",
-                              textAlign: TextAlign.start,
-                              style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
-                            )
-                          ],
+                      child: Card(
+                        color: const Color.fromARGB(255, 180, 255, 183),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.menu_book, size: 25, color: Color.fromARGB(255, 42, 169, 46)),
+                              SizedBox(height: 8),
+                              Text(
+                                "Edukasi",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                "Kumpulan informasi mengenai tindakan bullying.",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 40),
               // Tips Harian
               Container(
                 width: double.infinity,
@@ -254,6 +262,7 @@ class MainMenu extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 35),
             ],
           ),
         ),

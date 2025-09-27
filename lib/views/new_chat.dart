@@ -29,7 +29,7 @@ class _NewChatState extends State<NewChat> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 233, 220, 245),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -49,7 +49,7 @@ class _NewChatState extends State<NewChat> {
             padding: EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               radius: 16,
-              backgroundImage: AssetImage("assets/img/image1.jpeg"),
+              backgroundImage: AssetImage("assets/img/patrick.jpg"),
             ),
           ),
         ],
@@ -58,7 +58,7 @@ class _NewChatState extends State<NewChat> {
         children: [
           Expanded(
             child: Container(
-              color: const Color.fromARGB(255, 208, 249, 232),
+              color: const Color.fromARGB(255, 255, 255, 255),
               child: ListView.builder(
                 padding: const EdgeInsets.all(16.0),
                 itemCount: _messages.length,
@@ -69,7 +69,7 @@ class _NewChatState extends State<NewChat> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       margin: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade200,
+                        color: const Color.fromARGB(255, 144, 249, 156),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -90,7 +90,7 @@ class _NewChatState extends State<NewChat> {
 
   Widget _buildTextComposer() {
     return Container(
-      color: Colors.white,
+      color: Color.fromARGB(255, 214, 184, 243),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
