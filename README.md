@@ -1,16 +1,12 @@
 # flutter_5a
 
-A new Flutter project.
+**NAMA**: I GEDE RYAN RAY SANA
+**NIM**: 2315051043
+**KELAS**: PTI 5A
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Note 03/10/2025:
+- Update code dan tampilan.
+- Sudah me;akukan Integrasi Auth dengan API
+- **Perubahan ENDPOINT API** : Saat saya menggunakan API **Reqres.in** untuk mendapatkan data dummy pengguna, saya menemukan bahwa endpoint *https://reqres.in/api/users?page=2* sekarang mengembalikan data yang tidak sesuai (data warna) alih-alih data pengguna. Oleh karena itu, untuk memastikan aplikasi berjalan dengan baik dan menggunakan data yang relevan, saya telah beralih ke layanan **DummyJSON.com** dengan endpoint *https://dummyjson.com/users*.

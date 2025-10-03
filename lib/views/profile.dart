@@ -1,150 +1,140 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5a/views/login.dart';
 
 class Profile extends StatelessWidget {
-  // Tambahkan properti username untuk menerima data dari halaman sebelumnya
-  final String? username;
-  const Profile({super.key, this.username});
+  final String username;
+  final String email;
+  final String imageUrl; // tambahan untuk foto profil
+
+  const Profile({
+    super.key,
+    required this.username,
+    required this.email,
+    required this.imageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Controller isi dummy dari login
+    TextEditingController emailController =
+        TextEditingController(text: email);
+    TextEditingController usernameController =
+        TextEditingController(text: username);
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 233, 220, 245),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 50.0,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                'Informasi Akun',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 20),
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage("assets/img/patrick.jpg"),
-              ),
-              const SizedBox(height: 10),
-              // Gunakan username yang diterima, jika kosong gunakan default
-              Text(
-                username ?? 'Dwi Gitayana',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                'dwigitayana@gmail.com', // Teks email statis
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    // Aksi saat tombol "Edit Profile" ditekan
-                  },
-                  child: const Text('Edit Profile'),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildSlimTextField(
-                label: 'Email',
-                value: 'dwigitayana@gmail.com', // Nilai email statis
-                icon: Icons.person,
-              ),
-              const SizedBox(height: 10),
-              _buildSlimTextField(
-                label: 'Username',
-                value: username ?? 'Dwi Gitayana',
-                icon: Icons.person,
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const Login()),
-                      (Route<dynamic> route) => false,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold
-                    ),
-                  ),
-                ),
-              ),
-            ],
+      backgroundColor: Colors.lightBlue[100],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.teal),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          "Detail Profil",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildSlimTextField({
-    required String label,
-    required String value,
-    required IconData icon,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black54,
-          ),
-        ),
-        const SizedBox(height: 5),
-        Container(
-          height: 40,
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.blue),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: Colors.black54),
-              const SizedBox(width: 10),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.teal,
+              backgroundImage: imageUrl.isNotEmpty
+                  ? NetworkImage(imageUrl)
+                  : null,
+              child: imageUrl.isEmpty
+                  ? const Icon(Icons.person, size: 50, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              username,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              email,
+              style: const TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: "Email",
+                prefixIcon: Icon(Icons.email_outlined),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.teal, // Ini akan langsung terlihat
+                    width: 1.0,
+                  ),
+                ),
+                // Border saat fokus
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.teal, // Warna yang Anda inginkan saat fokus
+                    width: 1.0,
+                  ),
+                ),   
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: usernameController,
+              decoration: InputDecoration(
+                labelText: "Username",
+                prefixIcon: const Icon(Icons.person_outline),
+                // Border default (saat tidak fokus)
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.teal, // Ini akan langsung terlihat
+                    width: 1.0,
+                  ),
+                ),
+                // Border saat fokus
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.teal, // Warna yang Anda inginkan saat fokus
+                    width: 1.0,
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5), // Ubah nilainya menjadi lebih kecil
+                  ),
+                  minimumSize: const Size(100, 50),
+                ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Profil berhasil disimpan")),
+                  );
+                },
+                child: const Text(
+                  "SIMPAN",
+                  style: TextStyle(fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

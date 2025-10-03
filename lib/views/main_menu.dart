@@ -1,17 +1,64 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_5a/views/new_chat.dart';
-//import 'package:flutter_5a/views/education.dart';
-import 'package:flutter_5a/views/dashboard_main.dart';
-//import 'package:flutter_5a/views/report.dart';
+import 'package:flutter_5a/models/login_response_model.dart';
+import 'package:flutter_5a/views/tips.dart';
+import 'package:flutter_5a/views/new_chat.dart';
+import 'package:flutter_5a/views/report.dart';
+import 'package:flutter_5a/views/history.dart';
 
 class MainMenu extends StatelessWidget {
-  final String? username;
-  const MainMenu({super.key, this.username});
+  final LoginResponseModel user; // ambil data user dari API
+  const MainMenu({super.key, required this.user});
+
+  // Warna Teal Kustom
+  static const Color darkTeal = Color.fromARGB(255, 30, 150, 160);
+
+  // Data tombol fitur
+  static const List<Map<String, dynamic>> features = [
+    {
+      'title': 'Chatbot Edukatif',
+      'icon': Icons.smart_toy_outlined,
+      'bgColor': Color.fromARGB(255, 220, 245, 235),
+    },
+    {
+      'title': 'Laporan Cepat',
+      'icon': Icons.campaign_outlined,
+      'bgColor': Color.fromARGB(255, 255, 240, 230),
+    },
+    {
+      'title': 'Tips Harian',
+      'icon': Icons.lightbulb_outline,
+      'bgColor': Color.fromARGB(255, 255, 248, 220),
+    },
+    {
+      'title': 'Riwayat Deteksi',
+      'icon': Icons.library_books_outlined,
+      'bgColor': Color.fromARGB(255, 230, 245, 250),
+    },
+  ];
+
+  // Data artikel
+  static const List<Map<String, String>> articles = [
+    {
+      'title': 'Bully Verbal',
+      'subtitle': 'Lorem ipsum dolor sit amet consectetur adipiscing elit.',
+    },
+    {
+      'title': 'Cara Melaporkan Perundungan',
+      'subtitle': 'Lorem ipsum dolor sit amet consectetur adipiscing elit.',
+    },
+  ];
+
+  static const double featureButtonWidth = 75;
+  static const double featureSpacing = 12;
 
   @override
   Widget build(BuildContext context) {
+    final double totalFeatureWidth =
+        (featureButtonWidth * features.length) +
+        (featureSpacing * (features.length - 1));
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 233, 220, 245),
+      backgroundColor: Colors.lightBlue[100],
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -19,8 +66,8 @@ class MainMenu extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Untuk Header
-              const SizedBox(height: 12),
+              // --- Header ---
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -29,242 +76,301 @@ class MainMenu extends StatelessWidget {
                     children: [
                       const Text(
                         "Hallo,",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        username ?? "Dwi Gitayana",
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                        user.firstName, // ganti dummy username → API
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.w800),
                       ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      const Text(
+                      const SizedBox(height: 4),
+                      Text(
+                        /*user.email, // ambil email user dari API untuk email di main menu
+                         style: const TextStyle(
+                             fontSize: 14,
+                             color: Color.fromARGB(255, 99, 99, 99)),*/
                         "Selamat datang di SABDA!",
-                        style: TextStyle(fontSize: 12, color: Color.fromARGB(255, 99, 99, 99)),
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Color.fromARGB(255, 99, 99, 99)),
                       ),
                     ],
                   ),
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 30,
-                    backgroundImage: AssetImage("assets/img/patrick.jpg"),
                     backgroundColor: Colors.grey,
+                    backgroundImage: NetworkImage(user.image), // pakai foto user
                   )
                 ],
-              ),
-              const SizedBox(height: 30),
-
-              //card ke-1 INFO
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 172, 220, 255),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.shield_rounded, size: 25, color: Colors.blue),
-                    SizedBox(height: 12),
-                    Text(
-                      "Jangan takut bercerita, karena SABDA ruang amanmu untuk berbagi cerita.",
-                      style: TextStyle(fontSize: 14),
-                      textAlign: TextAlign.justify,
-                    ),
-                  ],
-                ),
               ),
 
               const SizedBox(height: 25),
 
-              // New Chat
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DashboardMain(initialIndex: 3),
-                          ),
-                        );
-                },
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 172, 220, 255),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(Icons.chat_rounded, size: 25, color: Colors.blue),
-                      SizedBox(height: 12),
-                      Text(
-                        "New Chat",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "Aku siap dengar kapan pun kamu mau cerita.",
-                        style: TextStyle(fontSize: 12, color: Color.fromARGB(255, 70, 91, 101)),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // row laporkan dan edukasi
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        // Ganti pushReplacement dengan push
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DashboardMain(initialIndex: 1),
-                          ),
-                        );
-                      },
-                      child: Card(
-                        color: Colors.red.shade100,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.send, size: 25, color: Colors.red),
-                              SizedBox(height: 8),
-                              Text(
-                                "Laporkan",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "Laporkan terkait masalah yang kamu alami!",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DashboardMain(initialIndex: 2),
-                          ),
-                        );
-                      },
-                      child: Card(
-                        color: const Color.fromARGB(255, 180, 255, 183),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.menu_book, size: 25, color: Color.fromARGB(255, 42, 169, 46)),
-                              SizedBox(height: 8),
-                              Text(
-                                "Edukasi",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "Kumpulan informasi mengenai tindakan bullying.",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 68, 88, 98)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-              // Tips Harian
+              // --- Info Perundungan ---
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.yellow.shade100,
+                  color: darkTeal,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
                   children: [
-                    Row(
-                      children: const [
-                        Icon(Icons.lightbulb, size: 30, color: Color.fromARGB(255, 255, 230, 0)),
-                        SizedBox(width: 12),
-                        Text(
-                          "Tips Harian",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                    const Icon(Icons.shield_rounded,
+                        size: 45, color: Colors.white),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "Hari ini: Tidak ada",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '5 Tips Mengatasi Bullying:',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                          Text(
+                            "Perundungan Terdeteksi",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "1. Tetap Tenang dan Percaya Diri: Jangan biarkan kata-kata mereka mempengaruhimu.",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "2. Beranikan Diri Berbicara: Ceritakan apa yang kamu alami kepada orang yang kamu percaya, seperti orang tua atau guru.",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "3. Jauhi Pelaku Bullying: Hindari tempat atau situasi di mana kamu mungkin akan bertemu mereka.",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "4. Jangan Membalas dengan Kekerasan: Balas dendam hanya akan membuat situasi lebih buruk.",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "5. Bangun Lingkaran Pertemanan Positif: Habiskan waktu dengan teman-teman yang mendukung dan menghargaimu.",
-                      style: TextStyle(fontSize: 14),
                     ),
                   ],
                 ),
               ),
+
+              const SizedBox(height: 30),
+
+              // --- Fitur ---
+              const Text(
+                "Fitur",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: darkTeal),
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: SizedBox(
+                  width: totalFeatureWidth,
+                  height: 120,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: features.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: featureSpacing),
+                    itemBuilder: (context, index) {
+                      final feature = features[index];
+                      return FeatureButton(
+                        title: feature['title'],
+                        icon: feature['icon'],
+                        bgColor: feature['bgColor'],
+                        iconTextColor: darkTeal,
+                        onTap: () {
+                          // Navigasi ke NewChat hanya jika tombol Chatbot Edukatif diklik
+                          if (feature['title'] == 'Chatbot Edukatif') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NewChat(),
+                              ),
+                            );
+                          } else if (feature['title'] == 'Laporan Cepat') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Report(), // Navigasi ke ReportPage
+                              ),
+                            );
+                          } else if (feature['title'] == 'Tips Harian') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Education(), // Navigasi ke Education
+                              ),
+                            );
+                          } 
+                           else if (feature['title'] == 'Riwayat Deteksi') { // Navigasi ke History
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const History(), 
+                              ),
+                            );
+                          } else {
+                            // Untuk tombol fitur lainnya
+                            debugPrint("Fitur '${feature['title']}' diklik");
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // --- Articles ---
+              const Text(
+                "Articles",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: darkTeal),
+              ),
+              const SizedBox(height: 12),
+              ...articles.map((article) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: ArticleCard(
+                      title: article['title']!,
+                      subtitle: article['subtitle']!,
+                      onTap: () {
+                        debugPrint("Artikel '${article['title']}' dibuka");
+                      },
+                    ),
+                  )),
               const SizedBox(height: 35),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- Tombol Fitur ---
+class FeatureButton extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color bgColor;
+  final Color iconTextColor;
+  final VoidCallback onTap;
+
+  const FeatureButton({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.bgColor,
+    required this.iconTextColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: MainMenu.featureButtonWidth,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 38, color: iconTextColor),
+            const SizedBox(height: 8),
+            Text(
+              title.replaceAll(' ', '\n'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: iconTextColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- Card Artikel ---
+class ArticleCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const ArticleCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: MainMenu.darkTeal.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.image_outlined,
+                size: 30,
+                color: MainMenu.darkTeal,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: Color.fromARGB(255, 99, 99, 99)),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

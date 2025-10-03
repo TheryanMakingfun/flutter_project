@@ -29,12 +29,12 @@ class _NewChatState extends State<NewChat> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 233, 220, 245),
+        backgroundColor: Colors.teal[300],
         elevation: 0,
-        leading: IconButton(
+        /*leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
-        ),
+        ),*/
         title: const Text(
           'SABDA Chat',
           style: TextStyle(
@@ -43,8 +43,8 @@ class _NewChatState extends State<NewChat> {
             fontSize: 20,
           ),
         ),
-        centerTitle: false,
-        actions: const [
+        centerTitle: true,
+        /*actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
@@ -52,7 +52,7 @@ class _NewChatState extends State<NewChat> {
               backgroundImage: AssetImage("assets/img/patrick.jpg"),
             ),
           ),
-        ],
+        ],*/
       ),
       body: Column(
         children: [
@@ -90,10 +90,10 @@ class _NewChatState extends State<NewChat> {
 
   Widget _buildTextComposer() {
     return Container(
-      color: Color.fromARGB(255, 214, 184, 243),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      color: Colors.teal[300],
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 50),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(24),

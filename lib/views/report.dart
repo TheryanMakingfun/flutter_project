@@ -60,9 +60,9 @@ class _ReportState extends State<Report> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 233, 220, 245),
+      backgroundColor:  Colors.red[100],
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 233, 220, 245),
+        backgroundColor:  Colors.red[100],
         title: const Text(
           'Laporkan',
           style: TextStyle(
@@ -251,7 +251,7 @@ class _ReportState extends State<Report> {
                   fillColor: Colors.white,
                 ),
               ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 40),
 
               // Tombol Darurat
               ElevatedButton(
@@ -297,7 +297,7 @@ class _ReportState extends State<Report> {
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 55),
             ],
           ),
         ),
