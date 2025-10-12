@@ -1,98 +1,161 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:flutter_5a/core/providers/tips_provider.dart';
+import 'package:flutter_5a/core/models/tips_model.dart';
 
-class Education extends StatelessWidget {
-  const Education({super.key});
+class Tips extends StatefulWidget {
+  const Tips({super.key});
+
+  @override
+  State<Tips> createState() => _TipsState();
+}
+
+class _TipsState extends State<Tips> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TipsProvider>(context, listen: false).fetchTips();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[100],
+      backgroundColor: Color.fromARGB(255,201, 230, 246),
       appBar: AppBar(
         title: const Text(
           'Tips Harian',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 14, 141, 156)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildEducationCard(
-                title: 'Apa itu bullying?',
-                description: 'Bullying adalah perilaku menyakiti orang lain secara sengaja dan berulang, baik fisik, verbal, maupun melalui dunia maya (cyber).',
-              ),
-              const SizedBox(height: 16),
-              _buildEducationCard(
-                title: 'Dampak bullying?',
-                description: 
-                'Bullying berdampak pada banyak pihak. Korban bisa mengalami trauma, ketakutan, rendah diri, dan gangguan mental. Pelaku akan terbiasa melakukan kekerasan dan berisiko menghadapi masalah hukum atau sosial. Lingkungan pun menjadi tidak aman dan hubungan antarindividu ikut rusak.',
-              ),
-              const SizedBox(height: 16),
-              _buildEducationCard(
-                title: 'Cara mengenali?',
-                description: 'Menarik diri, perubahan emosi drastis, nilai sekolah turun, sering sakit tanpa sebab jelas, atau enggan ke tempat tertentu.',
-              ),
-              const SizedBox(height: 16),
-              _buildEducationCard(
-                title: 'Cara menjadi teman pendukung?',
-                description: 'Dengarkan tanpa menghakimi, beri semangat, ajak bicara orang dewasa/ahli, dan jangan diam jika melihat perundungan.',
-              ),
-            ],
-          ),
+        child: Consumer<TipsProvider>(
+          builder: (context, tipsProvider, _) {
+            final isLoading = tipsProvider.isLoading;
+            final tips = tipsProvider.tips;
+
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: isLoading
+                  ? _buildShimmerList() // efek shimmer saat loading
+                  : _buildTipsList(tips), // tampilkan tips setelah load
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildEducationCard({required String title, required String description}) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 5,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.2),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+  // ✅ List shimmer agar tampak seperti beberapa card teks yang diload
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 3,
+          shadowColor: Colors.grey.shade200,
+          margin: const EdgeInsets.only(bottom: 16),
+          // Hapus Container dengan background putih di sini
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              period: const Duration(seconds: 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Judul shimmer
+                  Container(
+                    width: 160,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white, // Gunakan warna putih untuk efek shimmer
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Deskripsi shimmer 2 baris
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 5),
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ✅ List tips setelah data berhasil di-load
+  Widget _buildTipsList(List<TipsModel> tips) {
+    return ListView.builder(
+      itemCount: tips.length,
+      itemBuilder: (context, index) {
+        final tip = tips[index];
+        return Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 3,
+          shadowColor: Colors.grey.shade200,
+          margin: const EdgeInsets.only(bottom: 16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
             ),
-          ],
-        ),
-      ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tip.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  tip.description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade700,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

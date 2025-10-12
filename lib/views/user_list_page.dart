@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5a/models/user_response_model.dart';
-import 'package:flutter_5a/services/api_service.dart';
+import 'package:flutter_5a/core/models/user_response_model.dart';
+import 'package:flutter_5a/core/services/api_service.dart';
 
 class UserListPage extends StatefulWidget {
   const UserListPage({super.key});

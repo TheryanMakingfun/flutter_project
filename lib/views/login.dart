@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5a/services/api_service.dart';
-import 'package:flutter_5a/models/login_request_model.dart';
-import 'package:flutter_5a/models/login_response_model.dart';
+import 'package:flutter_5a/core/services/api_service.dart';
 import 'package:flutter_5a/views/dashboard_main.dart';
 //import 'package:flutter_5a/views/main_menu.dart';
+import 'package:flutter_5a/core/models/login_request_model.dart';
+import 'package:flutter_5a/core/models/login_response_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  Colors.lightBlue[100],
+      backgroundColor:  Color.fromARGB(255,201, 230, 246),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    backgroundColor: Colors.teal[600],
+                    backgroundColor: Color.fromARGB(255, 14, 141, 156),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -143,12 +143,12 @@ class _LoginPageState extends State<LoginPage> {
               // Garis pemisah "atau"
               Row(
                 children: const [
-                  Expanded(child: Divider(thickness: 1, color: Colors.teal)),
+                  Expanded(child: Divider(thickness: 1, color: Color.fromARGB(255, 14, 141, 156))),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Text("atau", style: TextStyle(color: Colors.black54)),
                   ),
-                  Expanded(child: Divider(thickness: 1, color: Colors.teal)),
+                  Expanded(child: Divider(thickness: 1, color: Color.fromARGB(255, 14, 141, 156))),
                 ],
               ),
               const SizedBox(height: 20),
@@ -162,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: const BorderSide(color: Colors.teal),
+                    side: const BorderSide(color: Color.fromARGB(255, 14, 141, 156)),
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -190,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Text(
                       "Daftar",
                       style: TextStyle(
-                        color: Colors.teal,
+                        color: Color.fromARGB(255, 14, 141, 156),
                         fontWeight: FontWeight.bold,
                       ),
                     ),

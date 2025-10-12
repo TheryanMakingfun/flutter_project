@@ -1,19 +1,18 @@
 import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_5a/models/delete_user_response_model.dart';
-import 'package:flutter_5a/models/login_request_model.dart';
-import 'package:flutter_5a/models/login_response_model.dart';
-import 'package:flutter_5a/models/register_request_model.dart';
-import 'package:flutter_5a/models/register_response_model.dart';
-import 'package:flutter_5a/models/update_user_request_model.dart';
-import 'package:flutter_5a/models/update_user_response_model.dart';
-import 'package:flutter_5a/models/user_response_model.dart';
+import 'package:flutter_5a/core/models/delete_user_response_model.dart';
+import 'package:flutter_5a/core/models/login_request_model.dart';
+import 'package:flutter_5a/core/models/login_response_model.dart';
+import 'package:flutter_5a/core/models/register_request_model.dart';
+import 'package:flutter_5a/core/models/register_response_model.dart';
+import 'package:flutter_5a/core/models/update_user_request_model.dart';
+import 'package:flutter_5a/core/models/update_user_response_model.dart';
+import 'package:flutter_5a/core/models/user_response_model.dart';
 
 class ApiService {
   final logger = Logger();
   final Dio _dio = Dio();
-  //final String _baseUrl = 'http://localhost:3000';
   final String _baseUrl = 'https://dummyjson.com';
 
 

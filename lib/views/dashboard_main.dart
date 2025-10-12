@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:flutter_5a/models/login_response_model.dart';
+import 'package:flutter_5a/core/models/login_response_model.dart';
 import 'package:flutter_5a/views/account_information.dart';
 import 'package:flutter_5a/views/main_menu.dart';
-import 'package:flutter_5a/views/new_chat.dart';
+import 'package:flutter_5a/views/chatbot.dart';
 
 class DashboardMain extends StatefulWidget {
-  final LoginResponseModel user; // terima data user API
+  final LoginResponseModel user;
   const DashboardMain({super.key, required this.user});
 
   @override
@@ -16,15 +16,16 @@ class DashboardMain extends StatefulWidget {
 class _DashboardMainState extends State<DashboardMain> {
   int _selectedIndex = 0; // Default tab = Home
 
+  // Widget yang akan ditampilkan di body
   List<Widget> get _widgetOptions {
     return [
-      // Home → MainMenu, kirim data user
+      // Index 0: MainMenu (Home)
       MainMenu(user: widget.user),
 
-      // Chat
-      const NewChat(),
+      // Index 1: Kosong, karena Chatbot akan di-push secara terpisah
+      const SizedBox(),
 
-      // Profile → AccountInformation, kirim data user
+      // Index 2: AccountInformation (Profile)
       AccountInformation(
         username: widget.user.username,
         email: widget.user.email,
@@ -41,20 +42,24 @@ class _DashboardMainState extends State<DashboardMain> {
         style: TabStyle.fixedCircle,
         backgroundColor: Colors.white,
         color: Colors.grey,
-        activeColor: const Color(0xFF397B86),
-        items: [
-          const TabItem(icon: Icons.home, title: 'Home'),
-          TabItem(
-            icon: Icon(Icons.smart_toy, color: Colors.white),
-            title: 'Chat',
-          ),
-          const TabItem(icon: Icons.person, title: 'Profile'),
+        activeColor: const Color.fromARGB(255, 14, 141, 156),
+        items: const [
+          TabItem(icon: Icons.home),
+          TabItem(icon: Icon(Icons.smart_toy, size: 28, color: Colors.white)),
+          TabItem(icon: Icons.person),
         ],
         initialActiveIndex: _selectedIndex,
         onTap: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+          if (index == 1) { // Jika ikon Chatbot diklik (indeks 1)
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Chatbot()),
+            );
+          } else { // Jika ikon Home atau Profile diklik
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
         },
       ),
     );
