@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "408681623035",
+    "project_id": "sabdaapp-2d974",
+    "storage_bucket": "sabdaapp-2d974.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:408681623035:android:9375c2db04c48daf0e6f5e",
+        "android_client_info": {
+          "package_name": "com.app.flutter_5a"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmzD1xxKvrrQ7sXGvfyVtkUBYCClysjqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

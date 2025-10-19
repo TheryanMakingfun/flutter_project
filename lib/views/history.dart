@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class History extends StatelessWidget {
   const History({super.key});
@@ -6,14 +7,19 @@ class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255,201, 230, 246), // 🎨 warna background halaman
       appBar: AppBar(
         title: const Text(
           "Riwayat Deteksi",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.lightBlue[100],
-        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Color.fromARGB(255,201, 230, 246),
         elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(FontAwesomeIcons.arrowLeft, color: Color.fromARGB(255, 14, 141, 156)),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: const Center(
         child: Text(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -54,7 +55,7 @@ class _ReportState extends State<Report> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 14, 141, 156)),
+          icon: const Icon(FontAwesomeIcons.arrowLeft, color: Color.fromARGB(255, 14, 141, 156)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -72,10 +73,10 @@ class _ReportState extends State<Report> {
               ),
               padding: const EdgeInsets.all(12),
               child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.mode_edit_outline_outlined,
-                      color: Colors.black, size: 32),
+                  Icon(FontAwesomeIcons.clipboardList, size: 35,
+                      color: Colors.black),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5a/core/services/chat_service.dart';
-import 'package:flutter_5a/views/report.dart';
+import 'package:flutter_5a/core/services/chat_service.dart'; // 💡 IMPORT ASLI DIGUNAKAN
+import 'package:flutter_5a/views/report.dart'; // 💡 IMPORT ASLI DIGUNAKAN
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lottie/lottie.dart';
 
 
 class Chatbot extends StatefulWidget {
@@ -12,6 +14,7 @@ class Chatbot extends StatefulWidget {
 
 class _ChatbotState extends State<Chatbot> {
   final TextEditingController _controller = TextEditingController();
+  // 🎯 Menggunakan ChatService yang diimpor
   final ChatService _chatService = ChatService();
   final List<Map<String, dynamic>> _messages = [
     {
@@ -82,7 +85,10 @@ class _ChatbotState extends State<Chatbot> {
           if (isBot)
             const CircleAvatar(
               radius: 25,
-              backgroundImage: AssetImage('assets/img/admin.jpg'),
+              // Ganti dengan path gambar yang benar:
+              backgroundImage: AssetImage('assets/img/admin.jpg'), 
+              backgroundColor: Color.fromARGB(255, 14, 141, 156),
+              //child: Icon(Icons.psychology, color: Colors.white),
             ),
           const SizedBox(width: 8),
           Flexible(
@@ -105,7 +111,8 @@ class _ChatbotState extends State<Chatbot> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    // 🎯 PERBAIKAN: Gunakan .withOpacity()
+                    color: Colors.black.withOpacity(0.05), 
                     spreadRadius: 1,
                     blurRadius: 5,
                     offset: const Offset(0, 3),
@@ -153,9 +160,11 @@ class _ChatbotState extends State<Chatbot> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                     // Logika untuk Bicara dengan Konselor
+                  },
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255,201, 230, 246),
+                    backgroundColor: const Color.fromARGB(255,201, 230, 246),
                     side: const BorderSide(color: Color.fromARGB(255, 14, 141, 156), width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -170,10 +179,13 @@ class _ChatbotState extends State<Chatbot> {
               const SizedBox(width: 8),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Report()),
-                    );},
+                  onPressed: () {
+                    // 🎯 Menggunakan Report class (menghilangkan peringatan unused import)
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Report()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255,201, 230, 246),
                     side: const BorderSide(color: Color.fromARGB(255, 14, 141, 156), width: 2),
@@ -212,12 +224,13 @@ class _ChatbotState extends State<Chatbot> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 14, 141, 156)),
+          icon: const Icon(FontAwesomeIcons.arrowLeft, color: Color.fromARGB(255, 14, 141, 156)),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
       ),
+      resizeToAvoidBottomInset: true, 
       body: Column(
         children: [
           Expanded(
@@ -231,69 +244,82 @@ class _ChatbotState extends State<Chatbot> {
             ),
           ),
           if (_isTyping)
-            const Padding(
-              padding: EdgeInsets.all(10.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, top: 5.0, bottom: 5.0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('SABDA is typing...'),
+                child: Lottie.asset(
+                  'assets/lottie/loading_dots.json', // 🎯 Ganti dengan path file Lottie Anda
+                  width: 90, // Sesuaikan lebar yang sesuai
+                  height: 60, // Sesuaikan tinggi yang sesuai
+                ),
               ),
             ),
-          _buildMessageInput(),
         ],
       ),
+      // 🎯 MESSAGE INPUT di bottomNavigationBar (Solusi agar tidak terlalu di bawah)
+      bottomNavigationBar: _buildMessageInput(), 
     );
   }
 
   Widget _buildMessageInput() {
-  return Container(
-    color: Colors.transparent,
-    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-    child: TextField(
-      controller: _controller,
-      onSubmitted: (value) => _sendMessage(),
-      decoration: InputDecoration(
-        hintText: 'Saya dapat menanyakan apa saja di aplikasi ini?',
-        hintStyle: const TextStyle(fontSize: 14, color: Color(0xFF5A5A5A)),
-        filled: true,
-        fillColor: const Color(0xFFE3F4FB), // Warna latar belakang field
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(
-            color: Color.fromARGB(255, 14, 141, 156), // Warna border
-            width: 2,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(
-            color: Color.fromARGB(255, 14, 141, 156), // Warna border saat tidak fokus
-            width: 2,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(
-            color: Color.fromARGB(255, 14, 141, 156), // Warna border saat fokus
-            width: 2,
-          ),
-        ),
-        suffixIcon: Container(
-            margin: const EdgeInsets.all(8),
-            width: 60, // Lebar 
-            height: 40, // Tinggi
-            decoration: BoxDecoration( 
-              color: const Color.fromARGB(255, 14, 141, 156),
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(50),
+    return Container(
+      color: Colors.transparent,
+      // Menyesuaikan padding bawah berdasarkan keyboard
+      padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, MediaQuery.of(context).viewInsets.bottom > 0 ? 8.0 : 20.0), 
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              onSubmitted: (value) => _sendMessage(),
+              decoration: InputDecoration(
+                hintText: 'Saya dapat menanyakan apa saja di aplikasi ini?',
+                hintStyle: const TextStyle(fontSize: 14, color: Color(0xFF5A5A5A)),
+                filled: true,
+                fillColor: const Color(0xFFE3F4FB),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(
+                    color: Color.fromARGB(255, 14, 141, 156),
+                    width: 2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(
+                    color: Color.fromARGB(255, 14, 141, 156),
+                    width: 2,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(
+                    color: Color.fromARGB(255, 14, 141, 156),
+                    width: 2,
+                  ),
+                ),
+              ),
             ),
-            child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
-              onPressed: _sendMessage,
+          ),
+          const SizedBox(width: 8),
+          Container(
+              margin: const EdgeInsets.only(right: 0),
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration( 
+                color: const Color.fromARGB(255, 14, 141, 156),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                onPressed: _sendMessage,
+              ),
             ),
-        ),
-      ),
-    ),
-  );
-}
+        ],
+      )
+    );
+  }
 }

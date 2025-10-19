@@ -1,6 +1,6 @@
 // To parse this JSON data, do
 //
-//     final RegisterRequestModel = RegisterRequestModelFromJson(jsonString);
+//   final RegisterRequestModel = RegisterRequestModelFromJson(jsonString);
 
 import 'dart:convert';
 
@@ -9,37 +9,26 @@ RegisterRequestModel registerRequestModelFromJson(String str) => RegisterRequest
 String registerRequestModelToJson(RegisterRequestModel data) => json.encode(data.toJson());
 
 class RegisterRequestModel {
-    String firstName;
-    String lastName;
-    int age;
-    String email;
-    String username;
-    String password;
+  // Hanya simpan satu nama untuk display name
+  String name; 
+  String email;
+  String password;
 
-    RegisterRequestModel({
-        required this.firstName,
-        required this.lastName,
-        required this.age,
-        required this.email,
-        required this.username,
-        required this.password,
-    });
+  RegisterRequestModel({
+    required this.name, // Gabungan dari firstName dan lastName
+    required this.email,
+    required this.password,
+  });
 
-    factory RegisterRequestModel.fromJson(Map<String, dynamic> json) => RegisterRequestModel(
-        firstName: json["firstName"],
-        lastName: json["lastName"],
-        age: json["age"],
-        email: json["email"],
-        username: json["username"],
-        password: json["password"],
-    );
+  factory RegisterRequestModel.fromJson(Map<String, dynamic> json) => RegisterRequestModel(
+    name: json["name"], 
+    email: json["email"],
+    password: json["password"],
+  );
 
-    Map<String, dynamic> toJson() => {
-        "firstName": firstName,
-        "lastName": lastName,
-        "age": age,
-        "email": email,
-        "username": username,
-        "password": password,
-    };
+  Map<String, dynamic> toJson() => {
+    "name": name,
+    "email": email,
+    "password": password,
+  };
 }

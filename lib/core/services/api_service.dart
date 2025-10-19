@@ -1,123 +1,115 @@
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_5a/core/models/delete_user_response_model.dart';
-import 'package:flutter_5a/core/models/login_request_model.dart';
-import 'package:flutter_5a/core/models/login_response_model.dart';
-import 'package:flutter_5a/core/models/register_request_model.dart';
-import 'package:flutter_5a/core/models/register_response_model.dart';
-import 'package:flutter_5a/core/models/update_user_request_model.dart';
-import 'package:flutter_5a/core/models/update_user_response_model.dart';
-import 'package:flutter_5a/core/models/user_response_model.dart';
 
 class ApiService {
   final logger = Logger();
-  final Dio _dio = Dio();
-  final String _baseUrl = 'https://dummyjson.com';
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-
-  Future<List<User>> getListUsers() async {
+  // 🔹 Login User with Email & Password
+  Future<User?> loginUser(String email, String password) async {
     try {
-      final response = await _dio.get('$_baseUrl/users');
-      if (response.statusCode == 200) {
-        final userResponse = UserResponse.fromJson(response.data);
-        return userResponse.users;
-      } else {
-        throw Exception('Gagal memuat daftar pengguna');
-      }
+      final UserCredential userCredential =
+          await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      logger.e("Login failed: ${e.message}");
+      rethrow;
     } catch (e) {
+      logger.e("Unknown login error: $e");
       rethrow;
     }
   }
 
-  // Register User
-  Future<RegisterResponseModel> registerUser(RegisterRequestModel requestModel) async {
+  // 🔹 Register User + save to Firestore
+  Future<User?> registerUser(String email, String password, String displayName) async {
     try {
-      final response = await _dio.post(
-        '$_baseUrl/users/add',
-        data: requestModel.toJson(), // kirim body JSON dari model
+      final UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return RegisterResponseModel.fromJson(response.data);
-      } else {
-        throw Exception('Gagal melakukan registrasi');
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        await _db.collection('users').doc(user.uid).set({
+          'email': email,
+          'displayName': displayName,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
       }
+      return user;
+    } on FirebaseAuthException catch (e) {
+      logger.e("Registration failed: ${e.message}");
+      rethrow;
     } catch (e) {
+      logger.e("Unknown registration error: $e");
       rethrow;
     }
   }
 
-  // Login User
-  Future<LoginResponseModel> loginUser(LoginRequestModel requestModel) async {
+  // 🔹 Get user profile from Firestore
+  Future<Map<String, dynamic>?> getUserProfile(String uid) async {
     try {
-      final response = await _dio.post(
-        '$_baseUrl/auth/login',
-        data: jsonEncode(requestModel.toJson()), // <<<<< ini penting
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-        logger.i("Request body: ${requestModel.toJson()}");
-        logger.i("Response status: ${response.statusCode}");
-        logger.i("Response data: ${response.data}");
-        logger.i("Login request body: ${jsonEncode(requestModel.toJson())}");
-
-      if (response.statusCode == 200) {
-        return LoginResponseModel.fromJson(response.data);
-      } else {
-        throw Exception('Login gagal, periksa username/password');
-      }
+      final doc = await _db.collection('users').doc(uid).get();
+      return doc.data();
     } catch (e) {
+      logger.e("Failed to get user profile: $e");
       rethrow;
     }
   }
 
-  // Update User
-  Future<UpdateUserResponseModel> updateUser(
-      int userId, UpdateUserRequestModel requestModel) async {
+  // 🔹 Update user profile
+  Future<void> updateUserProfile(String uid, Map<String, dynamic> data) async {
     try {
-      final response = await _dio.put(
-        '$_baseUrl/users/$userId',
-        data: requestModel.toJson(),
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        return UpdateUserResponseModel.fromJson(response.data);
-      } else {
-        throw Exception('Gagal memperbarui pengguna');
-      }
+      await _db.collection('users').doc(uid).update(data);
     } catch (e) {
+      logger.e("Failed to update profile: $e");
       rethrow;
     }
   }
 
-  // Delete User
-  Future<DeleteUserResponseModel> deleteUser(int userId) async {
+  // 🔹 Ensure user exists in Firestore (used for Google Sign-In)
+  Future<void> ensureUserExists(User user) async {
     try {
-      final response = await _dio.delete(
-        '$_baseUrl/users/$userId',
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
+      final docRef = _db.collection('users').doc(user.uid);
+      final docSnap = await docRef.get();
 
-      if (response.statusCode == 200) {
-        return DeleteUserResponseModel.fromJson(response.data);
+      if (!docSnap.exists) {
+        await docRef.set({
+          'email': user.email,
+          'displayName': user.displayName ?? '',
+          'photoURL': user.photoURL ?? '',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        logger.i("User ${user.email} created in Firestore");
       } else {
-        throw Exception('Gagal menghapus pengguna');
+        logger.i("User ${user.email} already exists in Firestore");
       }
     } catch (e) {
+      logger.e("Failed to ensure user exists: $e");
       rethrow;
     }
+  }
+
+  // 🔹 Delete user
+  Future<void> deleteUser(String uid) async {
+    try {
+      await _auth.currentUser?.delete();
+      await _db.collection('users').doc(uid).delete();
+    } catch (e) {
+      logger.e("Failed to delete user: $e");
+      rethrow;
+    }
+  }
+
+  // 🔹 Sign out
+  Future<void> signOut() async {
+    await _auth.signOut();
   }
 }

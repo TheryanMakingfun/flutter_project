@@ -1,23 +1,54 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_5a/core/providers/chat_provider.dart';
-import 'package:flutter_5a/views/login.dart';
 import 'package:provider/provider.dart';
+
+// ✅ Import provider
+import 'package:flutter_5a/core/providers/onboarding_provider.dart';
 import 'package:flutter_5a/core/providers/auth_provider.dart';
 import 'package:flutter_5a/core/providers/user_provider.dart';
 import 'package:flutter_5a/core/providers/tips_provider.dart';
 import 'package:flutter_5a/core/providers/report_provider.dart';
+import 'package:flutter_5a/core/providers/chat_provider.dart';
 
+// ✅ Import view
+import 'package:flutter_5a/views/onboarding_view.dart';
+import 'package:flutter_5a/views/login.dart';
+import 'package:flutter_5a/views/splash_screen.dart';
+
+// ✅ Firebase dan Notifikasi
+import 'package:flutter_5a/firebase_options.dart';
+import 'package:flutter_5a/core/services/notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+// 🔹 Background handler wajib static dan global
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print("📩 Handling background message: ${message.messageId}");
+}
 
 Future<void> main() async {
-  // Pastikan binding Flutter sudah diinisialisasi
   WidgetsFlutterBinding.ensureInitialized();
-  // ✅ Muat file .env sebelum runApp
+
+  // ✅ Inisialisasi Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // ✅ Load file .env (opsional kalau kamu pakai)
   await dotenv.load(fileName: ".env");
 
+  // ✅ Inisialisasi Notification Service (local + FCM)
+  await NotificationService.init();
+
+  // ✅ Set handler background message (wajib sebelum runApp)
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // ✅ Jalankan app
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => OnboardingProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => TipsProvider()),
@@ -32,19 +63,25 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor:  Color.fromARGB(255, 201, 230, 246)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 247, 247, 247),
+        ),
         fontFamily: "Poppins",
       ),
-      home: const LoginPage(),
+      home: const SplashScreen(),
+      routes: {
+        '/onboarding': (_) => const OnboardingView(),
+        '/login': (_) => const LoginPage(),
+      },
     );
   }
 }
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});

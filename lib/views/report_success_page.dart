@@ -47,9 +47,9 @@ class ReportSuccessPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Kembali ke halaman sebelumnya (misalnya, halaman utama atau dashboard)
-                    Navigator.popUntil(context, (route) => route.isFirst);
+                    //Navigator.popUntil(context, (route) => route.isFirst);
                     // Atau jika ingin kembali ke halaman report:
-                    // Navigator.pop(context);
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 14, 141, 156),

@@ -1,63 +1,151 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:flutter_5a/core/models/login_request_model.dart';
-import 'package:flutter_5a/core/models/login_response_model.dart';
-import 'package:flutter_5a/core/models/register_request_model.dart';
-import 'package:flutter_5a/core/models/register_response_model.dart';
-import 'package:flutter_5a/core/services/api_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_5a/core/models/user_model.dart'; // 🔹 sesuaikan path
 
-class AuthProvider with ChangeNotifier {
-  final logger = Logger();
-  final ApiService _apiService = ApiService();
+class AuthProvider extends ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  bool _isLoading = false;
-  bool _isLoggedIn = false;
-  LoginResponseModel? _loginResponse;
-  RegisterResponseModel? _registerResponse;
+  // 🔹 Google Sign-In
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+);
 
-  bool get isLoading => _isLoading;
-  bool get isLoggedIn => _isLoggedIn;
-  LoginResponseModel? get loginResponse => _loginResponse;
-  RegisterResponseModel? get registerResponse => _registerResponse;
-
-  // 🔹 LOGIN
-  Future<void> login(LoginRequestModel requestModel) async {
-    _isLoading = true;
-    notifyListeners();
-
+  // ======================================================
+  // 🔹 REGISTER DENGAN EMAIL
+  // ======================================================
+  Future<User?> registerWithEmailAndPassword(
+      String email, String password) async {
     try {
-      final response = await _apiService.loginUser(requestModel);
-      _loginResponse = response;
-      _isLoggedIn = true;
-    } catch (e) {
-      logger.e('Login error', error: e);
-      _isLoggedIn = false;
-    }
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    _isLoading = false;
-    notifyListeners();
+      final user = userCredential.user;
+      if (user != null) {
+        await _saveUserToFirestore(user);
+      }
+
+      return user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') throw 'Kata sandi terlalu lemah.';
+      if (e.code == 'email-already-in-use') throw 'Email sudah terdaftar.';
+      throw e.message ?? 'Terjadi kesalahan.';
+    }
   }
 
-  // 🔹 REGISTER
-  Future<void> register(RegisterRequestModel requestModel) async {
-    _isLoading = true;
-    notifyListeners();
-
+  // ======================================================
+  // 🔹 LOGIN DENGAN EMAIL
+  // ======================================================
+  Future<User?> signInWithEmailAndPassword(
+      String email, String password) async {
     try {
-      final response = await _apiService.registerUser(requestModel);
-      _registerResponse = response;
-    } catch (e) {
-      logger.e('Register error', error: e);
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') throw 'Pengguna tidak ditemukan.';
+      if (e.code == 'wrong-password') throw 'Kata sandi salah.';
+      throw e.message ?? 'Terjadi kesalahan.';
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
+  // ======================================================
+  // 🔹 LOGIN DENGAN GOOGLE
+  // ======================================================
+  Future<User?> signInWithGoogle() async {
+    try {
+      UserCredential userCredential;
+
+      if (kIsWeb) {
+        // ✅ Login popup untuk web
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        googleProvider.addScope('email');
+        googleProvider.addScope('profile');
+        userCredential = await _auth.signInWithPopup(googleProvider);
+      } else {
+        // ✅ Android/iOS
+        final GoogleSignInAccount? googleUser =
+            await _googleSignIn.signInSilently() ?? await _googleSignIn.signIn();
+
+        if (googleUser == null) return null;
+
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: googleAuth.accessToken,
+        );
+
+        userCredential = await _auth.signInWithCredential(credential);
+      }
+
+      final user = userCredential.user;
+      if (user != null) {
+        await _saveUserToFirestore(user);
+      }
+
+      return user;
+    } catch (e) {
+      throw 'Gagal login dengan Google: $e';
+    }
+  }
+
+  // ======================================================
   // 🔹 LOGOUT
-  void logout() {
-    _loginResponse = null;
-    _isLoggedIn = false;
-    notifyListeners();
+  // ======================================================
+  Future<void> signOut() async {
+    await _auth.signOut();
+    if (!kIsWeb) {
+      await _googleSignIn.signOut();
+    }
+  }
+
+  // ======================================================
+  // 🔹 STREAM USER AKTIF
+  // ======================================================
+  Stream<User?> get user => _auth.authStateChanges();
+
+  // ======================================================
+  // 🔹 SIMPAN DATA USER KE FIRESTORE (PAKAI MODEL)
+  // ======================================================
+  Future<void> _saveUserToFirestore(User user) async {
+  try {
+    final userDoc = _firestore.collection('users').doc(user.uid);
+    final snapshot = await userDoc.get();
+
+    if (!snapshot.exists) {
+      await userDoc.set({
+        'uid': user.uid,
+        'email': user.email,
+        'name': user.displayName ?? 'Pengguna',
+        'photoUrl': user.photoURL,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+  } catch (e) {
+    debugPrint("Firestore write error: $e");
+    // Biarkan login tetap lanjut walau gagal simpan Firestore
+  }
+}
+
+  // ======================================================
+  // 🔹 AMBIL DATA PROFIL USER DALAM BENTUK MODEL
+  // ======================================================
+  Future<UserModel?> getCurrentUserProfile() async {
+    final user = _auth.currentUser;
+    if (user == null) return null;
+
+    final doc = await _firestore.collection('users').doc(user.uid).get();
+    if (!doc.exists || doc.data() == null) return null;
+
+    return UserModel.fromMap(doc.data()!, doc.id);
   }
 }

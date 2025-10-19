@@ -1,80 +1,94 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_5a/views/dashboard_main.dart';
-import 'package:flutter_5a/views/register.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_5a/core/providers/auth_provider.dart';
+import 'package:flutter_5a/views/dashboard_main.dart';
+import 'package:flutter_5a/views/login.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:flutter_5a/core/providers/user_provider.dart';
 
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    // Pastikan tombol login hanya diproses jika form valid
+  Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-    
-    // Pastikan keyboard tertutup saat login
-    FocusScope.of(context).unfocus(); 
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Konfirmasi kata sandi tidak cocok.')),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      // Asumsi AuthProvider dan signInWithEmailAndPassword sudah diimplementasikan
-      await authProvider.signInWithEmailAndPassword(
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      final auth.User? user = await authProvider.registerWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
 
-      if (!mounted) return;
-      
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const DashboardMain(),
-        ),
-      );
+      if (user != null) {
+        await userProvider.saveNewUser(user, {
+          'name': _nameController.text.trim(),
+        });
 
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardMain()),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login gagal: ${e.toString()}')),
+        SnackBar(content: Text('Registrasi gagal: ${e.toString()}')),
       );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
+  Future<void> _handleGoogleRegister() async {
     setState(() => _isLoading = true);
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      await authProvider.signInWithGoogle();
+      final auth.User? user = await authProvider.signInWithGoogle();
 
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const DashboardMain()),
-      );
+      if (user != null && mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardMain()),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login Google gagal: ${e.toString()}')),
+        SnackBar(content: Text('Registrasi Google gagal: ${e.toString()}')),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -85,6 +99,15 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 201, 230, 246),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back,
+              color: Color.fromARGB(255, 14, 141, 156)),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -93,55 +116,52 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo
-                SizedBox(
-                  width: 170,
-                  height: 170,
-                  child: Center(
-                    // Pastikan path image benar
-                    child: Image.asset("assets/img/logo_sabda.png", fit: BoxFit.cover,),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // Judul
                 const Text(
-                  'Login',
+                  'Daftar Akun',
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 5),
                 const Text(
-                  'Masuk ke akun anda!',
+                  'Isi detail untuk membuat akun baru.',
                   style: TextStyle(fontSize: 16, color: Colors.black54),
                 ),
                 const SizedBox(height: 30),
 
-                // Email field
+                _buildTextField(
+                  controller: _nameController,
+                  hintText: 'Nama Lengkap',
+                  icon: Icons.person,
+                ),
+                const SizedBox(height: 15),
+
                 _buildTextField(
                   controller: _emailController,
                   hintText: 'Email',
                   icon: Icons.email,
                   isEmail: true,
-                  textInputAction: TextInputAction.next, 
                 ),
                 const SizedBox(height: 15),
 
-                // Password field
                 _buildTextField(
                   controller: _passwordController,
-                  hintText: 'Password',
+                  hintText: 'Kata Sandi',
                   icon: Icons.lock,
                   isPassword: true,
-                  textInputAction: TextInputAction.done, 
-                  onSubmitted: (_) => _handleLogin(),
+                ),
+                const SizedBox(height: 15),
+
+                _buildTextField(
+                  controller: _confirmPasswordController,
+                  hintText: 'Konfirmasi Kata Sandi',
+                  icon: Icons.lock_open,
+                  isPassword: true,
                 ),
                 const SizedBox(height: 20),
 
-                // Tombol login
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
+                    onPressed: _isLoading ? null : _handleRegister,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       backgroundColor: const Color.fromARGB(255, 14, 141, 156),
@@ -154,12 +174,10 @@ class _LoginPageState extends State<LoginPage> {
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
+                                strokeWidth: 2, color: Colors.white),
                           )
                         : const Text(
-                            'MASUK',
+                            'DAFTAR',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -168,58 +186,65 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
 
-                // Garis pemisah "atau"
                 Row(
                   children: const [
-                    Expanded(child: Divider(thickness: 1, color: Color.fromARGB(255, 14, 141, 156))),
+                    Expanded(
+                        child: Divider(
+                            thickness: 1,
+                            color: Color.fromARGB(255, 14, 141, 156))),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text("atau", style: TextStyle(color: Colors.black54)),
+                      child:
+                          Text("atau", style: TextStyle(color: Colors.black54)),
                     ),
-                    Expanded(child: Divider(thickness: 1, color: Color.fromARGB(255, 14, 141, 156))),
+                    Expanded(
+                        child: Divider(
+                            thickness: 1,
+                            color: Color.fromARGB(255, 14, 141, 156))),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                // Tombol Google
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: _isLoading ? null : _handleGoogleLogin,
+                    onPressed: _isLoading ? null : _handleGoogleRegister,
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: const BorderSide(color: Color.fromARGB(255, 14, 141, 156)),
+                      side: const BorderSide(
+                          color: Color.fromARGB(255, 14, 141, 156)),
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    // Pastikan path image benar
-                    icon: Image.asset('assets/img/google.png', height: 20.0), 
+                    icon: Image.asset('assets/img/google.png', height: 20.0),
                     label: const Text(
-                      "Sign with Google",
+                      "Daftar dengan Google",
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
 
-                // Link daftar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Belum punya akun? "),
+                    const Text("Sudah punya akun? "),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterPage()),
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
                         );
                       },
                       child: const Text(
-                        "Daftar",
+                        "Masuk",
                         style: TextStyle(
                           color: Color.fromARGB(255, 14, 141, 156),
                           fontWeight: FontWeight.bold,
@@ -227,7 +252,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     )
                   ],
-                )
+                ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -236,16 +262,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // 🛠️ Fungsi _buildTextField dimodifikasi untuk menerima aksi keyboard
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
     bool isPassword = false,
     bool isEmail = false,
-    // 🎯 Tambahkan parameter baru
-    TextInputAction? textInputAction,
-    ValueChanged<String>? onSubmitted,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -256,12 +278,9 @@ class _LoginPageState extends State<LoginPage> {
       child: TextFormField(
         controller: controller,
         obscureText: isPassword,
-        keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+        keyboardType:
+            isEmail ? TextInputType.emailAddress : TextInputType.text,
         style: const TextStyle(fontSize: 16),
-        // 🎯 Terapkan parameter baru ke TextFormField
-        textInputAction: textInputAction,
-        onFieldSubmitted: onSubmitted, // Gunakan onFieldSubmitted
-        
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,
@@ -274,6 +293,9 @@ class _LoginPageState extends State<LoginPage> {
           }
           if (isEmail && !value.contains('@')) {
             return 'Masukkan email yang valid';
+          }
+          if (isPassword && value.length < 6) {
+            return 'Kata sandi minimal 6 karakter';
           }
           return null;
         },
