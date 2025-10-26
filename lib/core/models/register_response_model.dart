@@ -2,6 +2,7 @@
 //
 //     final RegisterResponseModel = RegisterResponseModelFromJson(jsonString);
 
+/*
 import 'dart:convert';
 
 RegisterResponseModel registerResponseModelFromJson(String str) => RegisterResponseModel.fromJson(json.decode(str));
@@ -47,3 +48,5 @@ class RegisterResponseModel {
         "password": password,
     };
 }
+
+*/

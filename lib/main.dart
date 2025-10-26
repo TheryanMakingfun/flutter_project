@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 // ✅ Import provider
 import 'package:flutter_5a/core/providers/onboarding_provider.dart';
@@ -19,10 +20,11 @@ import 'package:flutter_5a/views/splash_screen.dart';
 // ✅ Firebase dan Notifikasi
 import 'package:flutter_5a/firebase_options.dart';
 import 'package:flutter_5a/core/services/notification_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
-// 🔹 Background handler wajib static dan global
+// 🔹 Background handler wajib static dan global (Top-level function)
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // PENTING: Harus inisialisasi Firebase lagi di sini
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   print("📩 Handling background message: ${message.messageId}");
 }
@@ -30,21 +32,28 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Inisialisasi Firebase
+  // ✅ 1️⃣ Load file .env lebih awal (sebelum Firebase)
+  await dotenv.load(fileName: ".env");
+
+  // (Opsional) Tes apakah .env sudah terbaca
+  print("🌍 ENV Loaded: ${dotenv.env['CLOUDINARY_CLOUD_NAME']}");
+
+  // ✅ 2️⃣ Set handler background message (wajib sebelum runApp)
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // ✅ 3️⃣ Inisialisasi Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // ✅ Load file .env (opsional kalau kamu pakai)
-  await dotenv.load(fileName: ".env");
+  // ✅ 4️⃣ Inisialisasi Local Notification & FCM
+  await NotificationService.initLocalNotifications(); // Notifikasi lokal
+  await NotificationService.initFCM(); // Listener FCM
 
-  // ✅ Inisialisasi Notification Service (local + FCM)
-  await NotificationService.init();
+  // ✅ 5️⃣ Jadwalkan notifikasi harian pukul 08:00
+  await NotificationService.scheduleDailyTip();
 
-  // ✅ Set handler background message (wajib sebelum runApp)
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  // ✅ Jalankan app
+  // ✅ 6️⃣ Jalankan App dengan MultiProvider
   runApp(
     MultiProvider(
       providers: [
@@ -66,7 +75,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter 5A',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromARGB(255, 247, 247, 247),
@@ -81,6 +91,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 
 class MyHomePage extends StatefulWidget {

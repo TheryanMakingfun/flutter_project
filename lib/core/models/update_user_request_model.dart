@@ -2,6 +2,7 @@
 //
 //     final UpdateUserRequestModel = UpdateUserRequestModelFromJson(jsonString);
 
+/*
 import 'dart:convert';
 
 UpdateUserRequestModel updateUserRequestModelFromJson(String str) => UpdateUserRequestModel.fromJson(json.decode(str));
@@ -31,3 +32,5 @@ class UpdateUserRequestModel {
         "email": email,
     };
 }
+
+*/

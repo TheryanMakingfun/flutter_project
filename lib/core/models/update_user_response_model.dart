@@ -2,6 +2,7 @@
 //
 //     final UpdateUserResponseModel = UpdateUserResponseModelFromJson(jsonString);
 
+/*
 import 'dart:convert';
 
 UpdateUserResponseModel updateUserResponseModelFromJson(String str) => UpdateUserResponseModel.fromJson(json.decode(str));
@@ -51,3 +52,4 @@ class UpdateUserResponseModel {
         "updatedAt": updatedAt.toIso8601String(),
     };
 }
+*/

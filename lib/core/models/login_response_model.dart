@@ -1,7 +1,7 @@
 // To parse this JSON data, do
 //
 //     final LoginResponseModel = LoginResponseModelFromJson(jsonString);
-
+/*
 import 'dart:convert';
 
 LoginResponseModel loginResponseModelFromJson(String str) => LoginResponseModel.fromJson(json.decode(str));
@@ -48,3 +48,4 @@ class LoginResponseModel {
         "image": image,
       };
 }
+*/

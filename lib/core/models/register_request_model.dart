@@ -1,7 +1,7 @@
 // To parse this JSON data, do
 //
 //   final RegisterRequestModel = RegisterRequestModelFromJson(jsonString);
-
+/* 
 import 'dart:convert';
 
 RegisterRequestModel registerRequestModelFromJson(String str) => RegisterRequestModel.fromJson(json.decode(str));
@@ -32,3 +32,5 @@ class RegisterRequestModel {
     "password": password,
   };
 }
+
+*/
