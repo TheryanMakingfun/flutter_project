@@ -39,6 +39,7 @@ assets/
 /build/
 /coverage/
 .flutter-plugins
+firebase_keys/
 
 # Symbolication related
 app.*.symbols

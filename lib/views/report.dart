@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter_5a/core/providers/report_provider.dart';
 import 'package:flutter_5a/views/report_success_page.dart';
 
@@ -41,7 +42,7 @@ class _ReportState extends State<Report> {
     final isLoading = provider.isLoading;
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255,201, 230, 246),
+      backgroundColor: const Color.fromARGB(255, 201, 230, 246),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 201, 230, 246),
         elevation: 0,
@@ -55,7 +56,8 @@ class _ReportState extends State<Report> {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(FontAwesomeIcons.arrowLeft, color: Color.fromARGB(255, 14, 141, 156)),
+          icon: const Icon(FontAwesomeIcons.arrowLeft,
+              color: Color.fromARGB(255, 14, 141, 156)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -75,8 +77,8 @@ class _ReportState extends State<Report> {
               child: const Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(FontAwesomeIcons.clipboardList, size: 35,
-                      color: Colors.black),
+                  Icon(FontAwesomeIcons.clipboardList,
+                      size: 35, color: Colors.black),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -93,7 +95,6 @@ class _ReportState extends State<Report> {
             ),
             const SizedBox(height: 24),
 
-            // Container putih besar
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -117,7 +118,55 @@ class _ReportState extends State<Report> {
     );
   }
 
-  // 👉 Form asli dari kode kamu
+  /// ------------------------------------------------
+  ///            FIXED VERSION: GET CURRENT LOCATION
+  /// ------------------------------------------------
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Layanan lokasi tidak aktif")),
+      );
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Izin lokasi ditolak")),
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Izin lokasi ditolak permanen. Buka pengaturan.")),
+      );
+      return;
+    }
+
+    /// FIX: tidak lagi pakai desiredAccuracy deprecated
+    final pos = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _locationController.text = "${pos.latitude}, ${pos.longitude}";
+    });
+  }
+
+  /// ------------------------------------------------
+
   Widget _buildForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +183,7 @@ class _ReportState extends State<Report> {
 
         _buildLabel("Dimana kejadian terjadi?"),
         const SizedBox(height: 8),
-        _buildTextField(_locationController, "Kantin, Kelas 8B, ..."),
+        _buildLocationField(),
         const SizedBox(height: 16),
 
         _buildLabel("Ceritakan Kejadian"),
@@ -145,10 +194,13 @@ class _ReportState extends State<Report> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {Navigator.push(
+            onPressed: () {
+              Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ReportSuccessPage()),
-              );},
+                MaterialPageRoute(
+                    builder: (context) => const ReportSuccessPage()),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color.fromARGB(255, 14, 141, 156),
               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -172,7 +224,6 @@ class _ReportState extends State<Report> {
     );
   }
 
-  // 👉 Shimmer Placeholder
   Widget _buildShimmerPlaceholder() {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
@@ -203,7 +254,6 @@ class _ReportState extends State<Report> {
     );
   }
 
-  // 🔹 Helper functions
   Widget _buildLabel(String text) => Text(
         text,
         style: const TextStyle(
@@ -219,7 +269,9 @@ class _ReportState extends State<Report> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
-            color: const Color.fromARGB(255, 14, 141, 156), width: 1.2),
+          color: const Color.fromARGB(255, 14, 141, 156),
+          width: 1.2,
+        ),
         borderRadius: BorderRadius.circular(10),
       ),
       child: DropdownButtonHideUnderline(
@@ -244,7 +296,9 @@ class _ReportState extends State<Report> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
-            color: const Color.fromARGB(255, 14, 141, 156), width: 1.2),
+          color: const Color.fromARGB(255, 14, 141, 156),
+          width: 1.2,
+        ),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -262,6 +316,41 @@ class _ReportState extends State<Report> {
           ),
           const Icon(Icons.calendar_today_rounded,
               size: 20, color: Colors.grey),
+        ],
+      ),
+    );
+  }
+
+  /// FIXED: FIELD LOKASI (DESAIN TETAP)
+  Widget _buildLocationField() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: const Color.fromARGB(255, 14, 141, 156),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _locationController,
+              decoration: InputDecoration(
+                hintText: "Kantin, Kelas 8B, ...",
+                hintStyle: TextStyle(color: Colors.grey.shade500),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.location_on,
+                color: Color.fromARGB(255, 14, 141, 156)),
+            onPressed: _getCurrentLocation,
+          ),
         ],
       ),
     );
