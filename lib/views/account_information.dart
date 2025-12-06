@@ -122,13 +122,12 @@ class _AccountInformationState extends State<AccountInformation> {
                       title: Text(_userData?['name'] ?? 'Pengguna', style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(_userData?['email'] ?? 'Tidak ada email'),
                       trailing: const Icon(Icons.arrow_forward_ios, color: Color.fromARGB(255, 14, 141, 156)),
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const Profile(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const Profile()),
                         );
+                        _loadUserData();
                       },
                     ),
                   ),

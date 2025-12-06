@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_5a/core/helpers/custom_toaster.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -195,6 +196,8 @@ class _ReportState extends State<Report> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
+              showThemedToast("Berhasil Melaporkan Bullying", AlertTypeToaster.success);
+              
               Navigator.push(
                 context,
                 MaterialPageRoute(

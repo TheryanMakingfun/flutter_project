@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_5a/core/helpers/custom_toaster.dart';
 import 'package:flutter_5a/core/providers/user_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -39,40 +40,35 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<void> _handleSave() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-  final newName = _nameController.text.trim();
+    final newName = _nameController.text.trim();
 
-  try {
-    // 🔹 Update ke FirebaseAuth
-    await user.updateDisplayName(newName);
+    try {
+      // 🔹 Update ke FirebaseAuth
+      await user.updateDisplayName(newName);
 
-    // 🔹 Update juga ke Firestore (UserProvider kamu)
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    await userProvider.updateUserData(user.uid, {
-      'name': newName,
-    });
+      // 🔹 Update juga ke Firestore (UserProvider kamu)
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      await userProvider.updateUserData(user.uid, {
+        'name': newName,
+      });
 
-    // 🔹 Refresh tampilan lokal
-    setState(() {
-      _userData?['name'] = newName;
-    });
+      // 🔹 Refresh tampilan lokal
+      setState(() {
+        _userData?['name'] = newName;
+      });
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profil berhasil disimpan")),
-      );
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal menyimpan profil: $e")),
-      );
+      if (mounted) {
+        showThemedToast("Profil berhasil disimpan", AlertTypeToaster.success);
+      }
+    } catch (e) {
+      if (mounted) {
+        showThemedToast("Gagal menyimpan profile. Coba periksa koneksi atau ulangi lagi.", AlertTypeToaster.danger);
+      }
     }
   }
-}
-
 
   // Fungsi baru untuk mengganti foto profil
   Future<void> _changeProfilePicture() async {
@@ -88,15 +84,11 @@ class _ProfileState extends State<Profile> {
         setState(() {
           _userData?['photo'] = newImageUrl;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Foto profil berhasil diperbarui.")),
-        );
+        showThemedToast("Foto profil berhasil diperbarui.", AlertTypeToaster.success);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Gagal memperbarui foto: $e")),
-        );
+        showThemedToast("Gagal memperbarui foto. Coba periksa koneksi atau ulangi lagi.", AlertTypeToaster.danger);
       }
     } finally {
       if (mounted) {

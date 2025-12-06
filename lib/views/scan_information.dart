@@ -41,13 +41,20 @@ class _ScanInformationState extends State<ScanInformation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 14, 141, 156),
+      backgroundColor: const Color.fromARGB(255, 201, 230, 246),
 
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 14, 141, 156),
+        backgroundColor: const Color.fromARGB(255, 201, 230, 246),
         elevation: 0,
-        title: const Text("Scan QR Code", style: TextStyle(color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
+        title: const Text(
+          "Scan QR Code",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          )),
+        iconTheme: const IconThemeData(color: Color.fromARGB(255, 14, 141, 156)),
       ),
 
       body: Column(
