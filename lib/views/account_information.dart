@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_5a/core/services/auth_service.dart';
 import 'package:flutter_5a/views/login.dart';
 import 'package:flutter_5a/views/profile.dart';
 import 'package:flutter_5a/core/providers/user_provider.dart';
+//import 'package:flutter_5a/views/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_5a/core/providers/auth_provider.dart';
@@ -35,16 +37,24 @@ class _AccountInformationState extends State<AccountInformation> {
     }
   }
 
-  void _logout(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.signOut();
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-      (Route<dynamic> route) => false,
-    );
-  }
+  void _logout() async {
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  final authService = AuthService();
+
+  await authProvider.signOut();
+  await authService.logoutUser();
+
+  if (!mounted) return;
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => const LoginPage()),
+    (route) => false,
+  );
+}
+
+
+
 
   Widget _buildShimmerContent() {
     return Shimmer.fromColors(
@@ -172,7 +182,7 @@ class _AccountInformationState extends State<AccountInformation> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                         minimumSize: const Size(100, 50),
                       ),
-                      onPressed: () => _logout(context),
+                      onPressed: () => _logout,
                       child: const Text("KELUAR", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ),

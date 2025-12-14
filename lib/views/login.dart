@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
+import 'package:provider/provider.dart';
+
 import 'package:flutter_5a/views/dashboard_main.dart';
 import 'package:flutter_5a/views/register.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_5a/core/providers/auth_provider.dart';
-
+import 'package:flutter_5a/core/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +18,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final AuthService _authService = AuthService();
+
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -26,55 +30,70 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // 🔥 LOGIN EMAIL/PASSWORD + SIMPAN SESI LOKAL
   Future<void> _handleLogin() async {
-    // Pastikan tombol login hanya diproses jika form valid
     if (!_formKey.currentState!.validate()) return;
-    
-    // Pastikan keyboard tertutup saat login
-    FocusScope.of(context).unfocus(); 
 
+    FocusScope.of(context).unfocus();
     setState(() => _isLoading = true);
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      // Asumsi AuthProvider dan signInWithEmailAndPassword sudah diimplementasikan
+
+      // 1️⃣ LOGIN Firebase
       await authProvider.signInWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
 
+      // 2️⃣ SIMPAN STATUS LOGIN DI SharedPreferences
+      await _authService.loginUser(_emailController.text.trim());
+
       if (!mounted) return;
-      
+
+      // 3️⃣ Masuk dashboard
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const DashboardMain(),
-        ),
+        MaterialPageRoute(builder: (context) => const DashboardMain()),
       );
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login gagal: ${e.toString()}')),
+        SnackBar(content: Text('Login gagal: $e')),
       );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
+  // 🔥 LOGIN GOOGLE + SIMPAN SESI LOKAL
   Future<void> _handleGoogleLogin() async {
     setState(() => _isLoading = true);
+
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      // 1️⃣ LOGIN melalui Google
       await authProvider.signInWithGoogle();
 
+      // 2️⃣ SIMPAN status login lokal (ambil email dari FirebaseAuth langsung)
+      final email = FirebaseAuth.instance.currentUser?.email;
+
+      if (email != null) {
+        await _authService.loginUser(email);
+      }
+
       if (!mounted) return;
+
+      // 3️⃣ Masuk dashboard
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const DashboardMain()),
       );
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login Google gagal: ${e.toString()}')),
+        SnackBar(content: Text('Login Google gagal: $e')),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -93,14 +112,13 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
                 // Logo
                 SizedBox(
                   width: 170,
                   height: 170,
-                  child: Center(
-                    // Pastikan path image benar
-                    child: Image.asset("assets/img/logo_sabda.png", fit: BoxFit.cover,),
-                  ),
+                  child: Image.asset("assets/img/logo_sabda.png",
+                      fit: BoxFit.cover),
                 ),
                 const SizedBox(height: 10),
 
@@ -116,23 +134,23 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 30),
 
-                // Email field
+                // Email
                 _buildTextField(
                   controller: _emailController,
                   hintText: 'Email',
                   icon: Icons.email,
                   isEmail: true,
-                  textInputAction: TextInputAction.next, 
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 15),
 
-                // Password field
+                // Password
                 _buildTextField(
                   controller: _passwordController,
                   hintText: 'Password',
                   icon: Icons.lock,
                   isPassword: true,
-                  textInputAction: TextInputAction.done, 
+                  textInputAction: TextInputAction.done,
                   onSubmitted: (_) => _handleLogin(),
                 ),
                 const SizedBox(height: 20),
@@ -170,43 +188,50 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Garis pemisah "atau"
+                // Divider
                 Row(
                   children: const [
-                    Expanded(child: Divider(thickness: 1, color: Color.fromARGB(255, 14, 141, 156))),
+                    Expanded(
+                        child: Divider(
+                            thickness: 1,
+                            color: Color.fromARGB(255, 14, 141, 156))),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text("atau", style: TextStyle(color: Colors.black54)),
                     ),
-                    Expanded(child: Divider(thickness: 1, color: Color.fromARGB(255, 14, 141, 156))),
+                    Expanded(
+                        child: Divider(
+                            thickness: 1,
+                            color: Color.fromARGB(255, 14, 141, 156))),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                // Tombol Google
+                // Login Google
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: _isLoading ? null : _handleGoogleLogin,
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: const BorderSide(color: Color.fromARGB(255, 14, 141, 156)),
+                      side: const BorderSide(
+                          color: Color.fromARGB(255, 14, 141, 156)),
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    // Pastikan path image benar
-                    icon: Image.asset('assets/img/google.png', height: 20.0), 
+                    icon: Image.asset('assets/img/google.png', height: 20.0),
                     label: const Text(
                       "Sign with Google",
                       style: TextStyle(fontSize: 16, color: Colors.black87),
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
 
-                // Link daftar
+                // Daftar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -215,7 +240,8 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterPage()),
+                          MaterialPageRoute(
+                              builder: (context) => const RegisterPage()),
                         );
                       },
                       child: const Text(
@@ -227,7 +253,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     )
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -236,14 +262,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // 🛠️ Fungsi _buildTextField dimodifikasi untuk menerima aksi keyboard
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
     bool isPassword = false,
     bool isEmail = false,
-    // 🎯 Tambahkan parameter baru
     TextInputAction? textInputAction,
     ValueChanged<String>? onSubmitted,
   }) {
@@ -258,10 +282,8 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: isPassword,
         keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
         style: const TextStyle(fontSize: 16),
-        // 🎯 Terapkan parameter baru ke TextFormField
         textInputAction: textInputAction,
-        onFieldSubmitted: onSubmitted, // Gunakan onFieldSubmitted
-        
+        onFieldSubmitted: onSubmitted,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,

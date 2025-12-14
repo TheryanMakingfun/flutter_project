@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'start_view.dart'; // pastikan nanti kamu buat file ini ya
+import 'package:flutter_5a/core/helpers/auth_wrapper.dart'; // 🔥 ganti StartView → AuthWrapper
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,11 +13,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Timer 2 detik sebelum pindah ke halaman Start
+
+    // Timer 2 detik → masuk ke AuthWrapper (biometrik)
     Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const StartView()),
+        MaterialPageRoute(builder: (context) => const AuthWrapper()),
       );
     });
   }
@@ -25,10 +26,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 201, 230, 246), // biru muda lembut
+      backgroundColor: const Color.fromARGB(255, 201, 230, 246), // warna kamu tetap
       body: Center(
         child: Image.asset(
-          'assets/img/logo_sabda.png', // ganti sesuai path logo kamu
+          'assets/img/logo_sabda.png', // logo kamu tetap
           width: 180,
         ),
       ),

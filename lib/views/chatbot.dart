@@ -112,7 +112,7 @@ class _ChatbotState extends State<Chatbot> {
                 boxShadow: [
                   BoxShadow(
                     // 🎯 PERBAIKAN: Gunakan .withOpacity()
-                    color: Colors.black.withOpacity(0.05), 
+                    color: Colors.black.withValues(alpha: 0.05), 
                     spreadRadius: 1,
                     blurRadius: 5,
                     offset: const Offset(0, 3),
