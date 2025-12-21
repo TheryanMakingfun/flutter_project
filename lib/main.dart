@@ -83,7 +83,7 @@ class MyApp extends StatelessWidget {
         ),
         fontFamily: "Poppins",
       ),
-      home: const SplashScreen(),
+      home: const SplashScreen(),         //ubah dengan spalsh nanti dan kasi const
       routes: {
         '/onboarding': (_) => const OnboardingView(),
         '/login': (_) => const LoginPage(),

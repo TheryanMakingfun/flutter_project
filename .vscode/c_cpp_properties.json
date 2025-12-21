@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/flutter_windows_3.35.3-stable/flutter/bin/cache/artifacts/engine/windows-x64/**"
+                "D:/flutter_windows_3.38.3-stable/flutter/bin/cache/artifacts/engine/windows-x64/**"
             ],
             "defines": [
                 "_DEBUG",

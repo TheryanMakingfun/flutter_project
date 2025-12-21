@@ -17,6 +17,7 @@ class Report extends StatefulWidget {
 
 class _ReportState extends State<Report> {
   final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _locationtextController = TextEditingController();
   final TextEditingController _storyController = TextEditingController();
   String? _selectedBullyingType;
   DateTime? _selectedDate;
@@ -31,16 +32,18 @@ class _ReportState extends State<Report> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      if (!mounted) return;
-      Provider.of<ReportProvider>(context, listen: false).loadReportData();
+    // Memanggil simulasi loading agar Shimmer muncul saat halaman pertama kali dibuka
+    Future.microtask(() {
+      if (mounted) {
+        Provider.of<ReportProvider>(context, listen: false).loadReportData();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ReportProvider>(context);
-    final isLoading = provider.isLoading;
+    final bool isLoading = provider.isLoading;
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 201, 230, 246),
@@ -110,7 +113,8 @@ class _ReportState extends State<Report> {
                 ],
               ),
               padding: const EdgeInsets.all(20),
-              child: isLoading ? _buildShimmerPlaceholder() : _buildForm(),
+              // AKTIVASI SHIMMER: Jika isLoading true, tampilkan Shimmer
+              child: isLoading ? _buildShimmerPlaceholder() : _buildForm(provider),
             ),
             const SizedBox(height: 30),
           ],
@@ -119,9 +123,6 @@ class _ReportState extends State<Report> {
     );
   }
 
-  /// ------------------------------------------------
-  ///            FIXED VERSION: GET CURRENT LOCATION
-  /// ------------------------------------------------
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -153,7 +154,6 @@ class _ReportState extends State<Report> {
       return;
     }
 
-    /// FIX: tidak lagi pakai desiredAccuracy deprecated
     final pos = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
@@ -166,9 +166,7 @@ class _ReportState extends State<Report> {
     });
   }
 
-  /// ------------------------------------------------
-
-  Widget _buildForm() {
+  Widget _buildForm(ReportProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -184,6 +182,11 @@ class _ReportState extends State<Report> {
 
         _buildLabel("Dimana kejadian terjadi?"),
         const SizedBox(height: 8),
+        _buildLocationTextField(),
+        const SizedBox(height: 16),
+
+        _buildLabel("Koordinat Kejadian?"),
+        const SizedBox(height: 8),
         _buildLocationField(),
         const SizedBox(height: 16),
 
@@ -195,14 +198,38 @@ class _ReportState extends State<Report> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              showThemedToast("Berhasil Melaporkan Bullying", AlertTypeToaster.success);
-              
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const ReportSuccessPage()),
-              );
+            // Tombol tetap dinonaktifkan jika provider sedang memproses submit
+            onPressed: provider.isLoading ? null : () async {
+              if (_selectedBullyingType == null || 
+                  _selectedDate == null || 
+                  _locationtextController.text.isEmpty || 
+                  _locationController.text.isEmpty || 
+                  _storyController.text.isEmpty) {
+                showThemedToast("Mohon lengkapi semua data", AlertTypeToaster.warning);
+                return;
+              }
+
+              try {
+                await provider.submitReport(
+                  jenisPerundungan: _selectedBullyingType!,
+                  tglKejadian: _selectedDate!,
+                  tempat: _locationtextController.text,
+                  longLat: _locationController.text,
+                  detailKejadian: _storyController.text,
+                );
+
+                if (mounted) {
+                  showThemedToast("Berhasil Melaporkan Bullying", AlertTypeToaster.success);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ReportSuccessPage()),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  showThemedToast("Gagal: $e", AlertTypeToaster.danger);
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color.fromARGB(255, 14, 141, 156),
@@ -212,21 +239,28 @@ class _ReportState extends State<Report> {
               ),
               elevation: 0,
             ),
-            child: const Text(
-              "LAPORKAN",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
-                color: Colors.white,
-              ),
-            ),
+            child: provider.isLoading 
+              ? const SizedBox(
+                  height: 20, 
+                  width: 20, 
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                )
+              : const Text(
+                  "LAPORKAN",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    color: Colors.white,
+                  ),
+                ),
           ),
         ),
       ],
     );
   }
 
+  // FUNGSI SHIMMER SEKARANG DIPANGGIL DI BUILD
   Widget _buildShimmerPlaceholder() {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
@@ -324,7 +358,28 @@ class _ReportState extends State<Report> {
     );
   }
 
-  /// FIXED: FIELD LOKASI (DESAIN TETAP)
+  Widget _buildLocationTextField() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: const Color.fromARGB(255, 14, 141, 156),
+          width: 1.2,
+        ),
+      ),
+      child: TextField(
+        controller: _locationtextController,
+        decoration: InputDecoration(
+          hintText: "Kantin, Kelas 8B, ...",
+          hintStyle: TextStyle(color: Colors.grey.shade500),
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
   Widget _buildLocationField() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -342,13 +397,12 @@ class _ReportState extends State<Report> {
             child: TextField(
               controller: _locationController,
               decoration: InputDecoration(
-                hintText: "Kantin, Kelas 8B, ...",
+                hintText: "Koordinat long-lat...",
                 hintStyle: TextStyle(color: Colors.grey.shade500),
                 border: InputBorder.none,
               ),
             ),
           ),
-
           IconButton(
             icon: const Icon(Icons.location_on,
                 color: Color.fromARGB(255, 14, 141, 156)),
@@ -359,26 +413,22 @@ class _ReportState extends State<Report> {
     );
   }
 
-  Widget _buildTextField(TextEditingController c, String hint,
-      [int maxLines = 1]) {
+  Widget _buildTextField(TextEditingController c, String hint, [int maxLines = 1]) {
     return TextField(
       controller: c,
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-              color: Color.fromARGB(255, 14, 141, 156), width: 1.2),
+          borderSide: const BorderSide(color: Color.fromARGB(255, 14, 141, 156), width: 1.2),
           borderRadius: BorderRadius.circular(10),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-              color: Color.fromARGB(255, 14, 141, 156), width: 1.5),
+          borderSide: const BorderSide(color: Color.fromARGB(255, 14, 141, 156), width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
       ),

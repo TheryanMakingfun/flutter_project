@@ -20,26 +20,23 @@ class _AuthWrapperState extends State<AuthWrapper> {
   }
 
   Future<void> _checkAutoLogin() async {
-    // 1. Cek apakah user pernah login
-    bool hasLoggedIn = await _authService.isUserLoggedIn();
+  final hasLoggedIn = await _authService.isUserLoggedIn();
 
-    if (hasLoggedIn) {
-      // 2. Jalankan biometrik
-      bool isAuthenticated = await _authService.authenticate();
-
-      if (isAuthenticated) {
-        // Biomatrik sukses → langsung dashboard
-        _navigateTo(const DashboardMain());
-      } else {
-        // Biomatrik gagal → balik ke StartView
-        _navigateTo(const StartView());
-      }
-
-    } else {
-      // 3. Belum pernah login → StartView
-      _navigateTo(const StartView());
-    }
+  if (!hasLoggedIn) {
+    _navigateTo(const StartView());
+    return;
   }
+
+  final allowed = await _authService.checkBiometricIfNeeded();
+
+  if (!allowed) {
+    _navigateTo(const StartView());
+    return;
+  }
+
+  _navigateTo(const DashboardMain());
+}
+
 
   void _navigateTo(Widget page) {
     if (mounted) {

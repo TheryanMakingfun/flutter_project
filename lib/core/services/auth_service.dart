@@ -8,12 +8,17 @@ class AuthService {
   final logger = Logger(); 
  
   // 1. Simpan sesi login 
-  Future<void> loginUser(String email) async { 
-    final SharedPreferences prefs = await 
-SharedPreferences.getInstance(); 
-    await prefs.setString('email', email); 
-    await prefs.setBool('isLogin', true); 
-  } 
+  Future<void> loginUser(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final biometricEnabled =
+        prefs.getBool('biometric_enabled') ?? false;
+
+    await prefs.setString('email', email);
+
+    // 🔥 hanya simpan login jika biometric ON
+    await prefs.setBool('isLogin', biometricEnabled);
+  }
  
   // 2. Cek status login 
   Future<bool> isUserLoggedIn() async { 
@@ -56,5 +61,26 @@ SharedPreferences.getInstance();
     logger.e("Error Platform: $e"); 
     return false; 
     } 
-  } 
+  }
+
+  // 6. Simpan status biometric (ON / OFF)
+  Future<void> setBiometricEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('biometric_enabled', value);
+  }
+
+  // 7. Ambil status biometric
+  Future<bool> isBiometricEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('biometric_enabled') ?? false;
+  }
+
+  // 8. Validasi biometric jika diperlukan
+  Future<bool> checkBiometricIfNeeded() async {
+    final isEnabled = await isBiometricEnabled();
+    if (!isEnabled) return true; // 🔥 OFF → langsung lolos
+
+    return await authenticate(); // 🔥 ON → wajib biometric
+  }
+
 }

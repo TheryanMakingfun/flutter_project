@@ -159,16 +159,19 @@ class _MainMenuState extends State<MainMenu> {
               children: [
                 Container(width: 80, height: 18, color: Colors.white),
                 const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
                   children: List.generate(
                     features.length,
                     (index) => Container(
-                        width: 75,
-                        height: 120,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16))),
+                      width: 75,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
                   ),
                 ),
               ],
